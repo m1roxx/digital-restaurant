@@ -36,9 +36,9 @@ Widget dishTile(BuildContext context, Dish dish) {
               const SizedBox(height: 4),
               Text(
                 dish.shortDescription,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey,
+                  color: Colors.grey[500],
                 ),
               ),
 
@@ -48,7 +48,7 @@ Widget dishTile(BuildContext context, Dish dish) {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    dish.price,
+                    "\$${dish.price.toString()}",
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,

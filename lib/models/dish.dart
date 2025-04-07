@@ -1,11 +1,13 @@
 class Dish {
+  final String? id;
   final String title;
-  final String price;
+  final int price;
   final String description;
   final String imagePath;
   final String shortDescription;
   
   Dish({
+    this.id,
     required this.title,
     required this.price,
     required this.description,
