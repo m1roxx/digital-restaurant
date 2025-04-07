@@ -1,49 +1,74 @@
+import 'package:digital_restaurant/models/dish.dart';
 import 'package:flutter/material.dart';
 
-Widget dishTile(BuildContext context, String title, String description, String imagePath) {
+Widget dishTile(BuildContext context, Dish dish) {
   return Card(
-    elevation: 0,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(12),
     ),
-    margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+    elevation: 0,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.asset(
-                imagePath,
-                width: double.infinity,
-                height: 120,
-                fit: BoxFit.cover,
-              ),
+        SizedBox(
+          height: 180,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            child: Image.asset(
+              dish.imagePath,
+              fit: BoxFit.cover,
+              width: double.infinity,
             ),
-            Positioned(
-              bottom: 8,
-              left: 8,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                color: Colors.black54,
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
         Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Text(
-            description,
-            style: const TextStyle(fontSize: 16),
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                dish.title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                dish.shortDescription,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey,
+                ),
+              ),
+
+              const SizedBox(height: 4),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    dish.price,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+
+                  IconButton.filled(
+                    onPressed: () {},
+                    style: IconButton.styleFrom(
+                      padding: const EdgeInsets.all(6),
+                      minimumSize: const Size(36, 36),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    iconSize: 20,
+                    icon: const Icon(Icons.add),
+                  )
+                ],
+              ),
+            ],
           ),
         ),
       ],

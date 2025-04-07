@@ -11,6 +11,7 @@ class ProfilePage extends StatelessWidget {
     
     return ListView(
       children: [
+        // Settings
         Container(
           margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
           decoration: BoxDecoration(

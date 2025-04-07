@@ -1,17 +1,15 @@
-import 'package:digital_restaurant/models/ingredient.dart';
-
 class Dish {
   final String title;
-  final String shortDescription;
+  final String price;
   final String description;
   final String imagePath;
-  final List<Ingredient> ingredients;
-
+  final String shortDescription;
+  
   Dish({
     required this.title,
-    required this.shortDescription,
+    required this.price,
     required this.description,
     required this.imagePath,
-    required this.ingredients,
+    required this.shortDescription,
   });
 }

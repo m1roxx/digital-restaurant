@@ -1,18 +1,12 @@
-import 'package:digital_restaurant/models/ingredient.dart';
+import 'package:digital_restaurant/models/dish.dart';
 import 'package:flutter/material.dart';
 
 class DetailPage extends StatefulWidget {
-  final String title;
-  final String description;
-  final String imagePath;
-  final List<Ingredient> ingredients;
+  final Dish dish;
 
   const DetailPage({
     super.key,
-    required this.title,
-    required this.description,
-    required this.imagePath,
-    required this.ingredients,
+    required this.dish
   });
 
   @override
@@ -25,7 +19,7 @@ class _DetailPageState extends State<DetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.dish.title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -33,7 +27,7 @@ class _DetailPageState extends State<DetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              widget.title,
+              widget.dish.title,
               style: const TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
@@ -45,7 +39,7 @@ class _DetailPageState extends State<DetailPage> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                widget.imagePath,
+                widget.dish.imagePath,
                 height: 250,
                 width: double.infinity,
                 fit: BoxFit.cover,
@@ -55,34 +49,9 @@ class _DetailPageState extends State<DetailPage> {
             const SizedBox(height: 12),
 
             Text(
-              widget.description,
+              widget.dish.description,
               style: const TextStyle(
                 fontSize: 18,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Ingrendients",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 22,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            Expanded(
-              child: ListView.builder(
-                itemCount: widget.ingredients.length,
-                itemBuilder: (context, index) {
-                  final ingredient = widget.ingredients[index];
-                  return Text(
-                    ingredient.name,
-                    style: const TextStyle(fontSize: 16),
-                  );
-                },
               ),
             ),
           ],

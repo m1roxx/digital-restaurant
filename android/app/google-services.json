@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "233864881789",
+    "project_id": "digital-restaurant-d1f92",
+    "storage_bucket": "digital-restaurant-d1f92.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:233864881789:android:ab22784ae725af4a9d3314",
+        "android_client_info": {
+          "package_name": "com.example.digital_restaurant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_D1Ac2JeXA_ffySsZKfPQl-0QJSfMtGQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
