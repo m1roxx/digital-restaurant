@@ -1,7 +1,8 @@
+import 'package:digital_restaurant/pages/profile_page.dart';
 import 'package:digital_restaurant/pages/saved_page.dart';
 import 'package:digital_restaurant/pages/cart_page.dart';
 import 'package:digital_restaurant/pages/menu_page.dart';
-import 'package:digital_restaurant/pages/profile_page.dart';
+import 'package:digital_restaurant/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,14 +19,14 @@ class _HomePageState extends State<HomePage> {
     MenuPage(),
     CartPage(),
     BookmarkPage(),
-    ProfilePage(),
+    SettingsPage(),
   ];
 
   final List<String> _appBarTitles = [
     "Menu",
     "Cart",
     "Saved",
-    "Profile",
+    "Settings",
   ];
 
   void _navigateBottomBar(int index) {
@@ -42,8 +43,14 @@ class _HomePageState extends State<HomePage> {
         leading: const Icon(Icons.menu),
         actions: [
         IconButton(
-          icon: const Icon(Icons.search),
+          icon: const Icon(Icons.person),
           onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfilePage(),
+              ),
+            );
           },
         ),
       ],
@@ -59,7 +66,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(icon: Icon(Icons.restaurant_menu), label: "Menu"),
           BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "Cart"),
           BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Saved"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
         ]
       ),
     );

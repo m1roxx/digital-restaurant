@@ -1,71 +1,161 @@
-import 'package:digital_restaurant/controllers/theme_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeController = Provider.of<ThemeController>(context);
-    
-    return ListView(
-      children: [
-        // Settings
-        Container(
-          margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Padding(
-            padding: EdgeInsets.all(14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Profile header
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  "Settings",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold
+                Center(
+                  child: Container(
+                    width: 90,
+                    height: 90,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "IN",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                Icon(Icons.arrow_forward_ios)
-              ],
-            ),
-          ),
-        ),
-        
-        // Dark Mode Switch
-        Container(
-          margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+                
+                const SizedBox(height: 16),
                 const Text(
-                  "Dark Mode",
+                  "Ilyas Nugmanov",
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                Switch(
-                  value: themeController.isDarkMode,
-                  onChanged: (_) {
-                    themeController.toggleTheme();
-                  },
-                )
+                const SizedBox(height: 4),
+                Text(
+                  "Joined April 5, 2025",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
               ],
             ),
           ),
-        ),
-      ]
+          
+          const SizedBox(height: 32),
+          
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                // General 
+                Text(
+                  "General",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.person, color: Theme.of(context).colorScheme.onSurface),
+                        title: const Text("Ilyas Nugmanov"),
+                        dense: true,
+                      ),
+                      Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey[300]),
+                      ListTile(
+                        leading: Icon(Icons.email, color: Theme.of(context).colorScheme.onSurface),
+                        title: const Text("nugmanovilyas228@gmail.com"),
+                        dense: true,
+                      ),
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: 24),
+                
+                Text(
+                  "Account",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.edit, color: Theme.of(context).colorScheme.onSurface),
+                        title: const Text("Edit Profile"),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () {},
+                      ),
+                      Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey[300]),
+                      ListTile(
+                        leading: Icon(Icons.history, color: Theme.of(context).colorScheme.onSurface),
+                        title: const Text("Order History"),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                        onTap: () {},
+                      ),
+                      Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey[300]),
+                      ListTile(
+                        leading: Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
+                        title: Text(
+                          "Logout",
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                        ),
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
