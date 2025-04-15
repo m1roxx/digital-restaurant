@@ -1,19 +1,52 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_restaurant/models/dish.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class DetailPage extends StatefulWidget {
   final Dish dish;
-  const DetailPage({
-    super.key,
-    required this.dish
-  });
-  
+  const DetailPage({super.key, required this.dish});
+
   @override
   State<DetailPage> createState() => _DetailPageState();
 }
 
 class _DetailPageState extends State<DetailPage> {
   int quantity = 1;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Future<void> _addToCart() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please login to add to cart')),
+      );
+      return;
+    }
+
+    try {
+      await _firestore
+          .collection('carts')
+          .doc(user.uid)
+          .collection('items')
+          .doc(widget.dish.id)
+          .set({
+        'dishId': widget.dish.id,
+        'quantity': quantity,
+        'addedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${quantity}x ${widget.dish.title} added')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: ${e.toString()}')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,14 +188,7 @@ class _DetailPageState extends State<DetailPage> {
               // Add to cart button
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('${quantity}x ${widget.dish.title} added to cart'),
-                      ),
-                    );
-                    Navigator.pop(context);
-                  },
+                  onPressed: _addToCart,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     foregroundColor: Colors.white,
