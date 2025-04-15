@@ -79,11 +79,11 @@ class MenuPage extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 16),
                     child: GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => DetailPage(dish: dish),
-                          ),
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true, 
+                          backgroundColor: Colors.transparent,
+                          builder: (context) => DetailPage(dish: dish),
                         );
                       },
                       child: SizedBox(
