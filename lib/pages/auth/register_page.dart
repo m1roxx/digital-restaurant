@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:digital_restaurant/pages/home_page.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -10,7 +10,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // Form controllers
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -28,9 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
     super.dispose();
   }
 
-  // Registration function using Firebase Auth
   Future<void> _register() async {
-    // Validate password match
     if (_passwordController.text != _confirmPasswordController.text) {
       setState(() {
         _errorMessage = 'Passwords do not match';
@@ -38,7 +35,6 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    // Validate password length
     if (_passwordController.text.length < 6) {
       setState(() {
         _errorMessage = 'Password must be at least 6 characters';
@@ -52,21 +48,17 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      // Create user with email and password
       final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
       
-      // Update display name
       await userCredential.user?.updateDisplayName(_nameController.text.trim());
       
       if (!mounted) return;
       
-      // Navigate to HomePage after successful registration
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      // Используем go_router вместо Navigator
+      context.go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
         if (e.code == 'weak-password') {
@@ -94,6 +86,13 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         title: const Text('Create Account'),
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            // Используем go_router вместо Navigator.pop
+            context.pop();
+          },
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -120,7 +119,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 32),
                 
-                // Name input
                 TextField(
                   controller: _nameController,
                   decoration: InputDecoration(
@@ -136,7 +134,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 16),
                 
-                // Email input
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -154,7 +151,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 16),
                 
-                // Password input
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -171,7 +167,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 16),
                 
-                // Confirm password input
                 TextField(
                   controller: _confirmPasswordController,
                   obscureText: true,
@@ -187,7 +182,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
                 
-                // Error message display
                 if (_errorMessage.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
@@ -202,7 +196,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 
                 const SizedBox(height: 24),
                 
-                // Register button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -222,7 +215,6 @@ class _RegisterPageState extends State<RegisterPage> {
                 
                 const SizedBox(height: 16),
                 
-                // Login link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -234,7 +226,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        // Используем go_router вместо Navigator.pop
+                        context.pop();
                       },
                       child: Text(
                         'Login',

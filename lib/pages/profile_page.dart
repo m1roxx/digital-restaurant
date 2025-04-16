@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:digital_restaurant/pages/auth/login_page.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -91,11 +91,8 @@ class _ProfilePageState extends State<ProfilePage> {
       await FirebaseAuth.instance.signOut();
       if (!mounted) return;
       
-      // Перенаправляем на страницу логина после выхода
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
+      // Используем go_router вместо Navigator
+      context.go('/login');
     }
   }
 
@@ -108,7 +105,8 @@ class _ProfilePageState extends State<ProfilePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            // Используем go_router вместо Navigator.pop
+            context.pop();
           },
         ),
       ),
@@ -227,7 +225,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             title: const Text("Edit profile"),
                             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                             onTap: () {
-                              // Навигация на страницу редактирования профиля
+                              // Go_router навигация
+                              // context.push('/edit-profile');
                             },
                           ),
                           Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey[300]),
@@ -236,7 +235,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             title: const Text("Order history"),
                             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                             onTap: () {
-                              // Навигация на страницу истории заказов
+                              // Go_router навигация
+                              // context.push('/order-history');
                             },
                           ),
                           Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey[300]),

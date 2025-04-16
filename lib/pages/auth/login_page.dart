@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:digital_restaurant/pages/auth/register_page.dart';
-import 'package:digital_restaurant/pages/home_page.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,7 +10,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Form controllers
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   
@@ -25,7 +23,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Login function using Firebase Auth
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
@@ -40,10 +37,8 @@ class _LoginPageState extends State<LoginPage> {
       
       if (!mounted) return;
       
-      // Navigate to HomePage if login successful
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      // Используем go_router вместо Navigator
+      context.go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
         if (e.code == 'user-not-found') {
@@ -94,7 +89,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 48),
                 
-                // Email input
                 TextField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -112,7 +106,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16),
                 
-                // Password input
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -128,7 +121,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 
-                // Error message display
                 if (_errorMessage.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 16),
@@ -143,7 +135,6 @@ class _LoginPageState extends State<LoginPage> {
                 
                 const SizedBox(height: 24),
                 
-                // Login button
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -163,7 +154,6 @@ class _LoginPageState extends State<LoginPage> {
                 
                 const SizedBox(height: 16),
                 
-                // Register link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -175,12 +165,8 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterPage(),
-                          ),
-                        );
+                        // Используем go_router вместо Navigator.push
+                        context.push('/register');
                       },
                       child: Text(
                         'Register',

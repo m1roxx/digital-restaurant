@@ -1,5 +1,5 @@
-import 'package:digital_restaurant/auth_wrapper.dart';
 import 'package:digital_restaurant/controllers/theme_controller.dart';
+import 'package:digital_restaurant/router/app_router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:digital_restaurant/firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -137,13 +137,13 @@ class MyApp extends StatelessWidget {
       ),
     );
 
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Digital Restaurant',
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: themeController.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-      home: const AuthWrapper(),
+      routerConfig: appRouter,
     );
   }
 }
