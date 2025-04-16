@@ -37,7 +37,6 @@ class _LoginPageState extends State<LoginPage> {
       
       if (!mounted) return;
       
-      // Используем go_router вместо Navigator
       context.go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -165,7 +164,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Используем go_router вместо Navigator.push
                         context.push('/register');
                       },
                       child: Text(

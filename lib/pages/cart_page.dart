@@ -178,7 +178,6 @@ class CartPage extends StatelessWidget {
     TimeOfDay selectedTime = TimeOfDay.now();
     final currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
     
-    // Get total price from Firestore
     double total = 0;
     final cartItems = await FirebaseFirestore.instance
         .collection('carts')
@@ -273,11 +272,8 @@ class CartPage extends StatelessWidget {
                 ),
                 FilledButton(
                   onPressed: () {
-                    // Here you would process the order with the selected date and time
-                    // Since you mentioned not saving to DB, we'll just close the dialog
                     Navigator.of(context).pop();
-                    
-                    // Show confirmation
+                  
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

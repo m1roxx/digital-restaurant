@@ -57,7 +57,6 @@ class _RegisterPageState extends State<RegisterPage> {
       
       if (!mounted) return;
       
-      // Используем go_router вместо Navigator
       context.go('/home');
     } on FirebaseAuthException catch (e) {
       setState(() {
@@ -89,7 +88,6 @@ class _RegisterPageState extends State<RegisterPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Используем go_router вместо Navigator.pop
             context.pop();
           },
         ),
@@ -226,7 +224,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Используем go_router вместо Navigator.pop
                         context.pop();
                       },
                       child: Text(

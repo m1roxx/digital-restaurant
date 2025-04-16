@@ -2,6 +2,7 @@ import 'package:digital_restaurant/auth_wrapper.dart';
 import 'package:digital_restaurant/pages/auth/login_page.dart';
 import 'package:digital_restaurant/pages/auth/register_page.dart';
 import 'package:digital_restaurant/pages/cart_page.dart';
+import 'package:digital_restaurant/pages/edit_profile_page.dart';
 import 'package:digital_restaurant/pages/home_page.dart';
 import 'package:digital_restaurant/pages/menu_page.dart';
 import 'package:digital_restaurant/pages/profile_page.dart';
@@ -70,6 +71,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/profile',
       builder: (context, state) => const ProfilePage(),
+    ),
+    GoRoute(
+      path: '/edit-profile',
+      builder: (context, state) => const EditProfilePage(),
     ),
     GoRoute(
       path: '/login',

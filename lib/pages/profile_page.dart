@@ -25,16 +25,12 @@ class _ProfilePageState extends State<ProfilePage> {
   void _loadUserData() {
     if (_currentUser != null) {
       setState(() {
-        // Получаем email пользователя
-        _userEmail = _currentUser!.email ?? "No email";
-        
-        // Получаем имя пользователя, если оно отсутствует, используем первую часть email
+        _userEmail = _currentUser.email ?? "No email";
         _userName = _currentUser.displayName ?? 
             (_userEmail.contains('@') ? _userEmail.split('@')[0] : "User");
         
-        // Создаем инициалы из имени пользователя
-        if (_currentUser!.displayName != null && _currentUser.displayName!.isNotEmpty) {
-          List<String> nameParts = _currentUser!.displayName!.split(' ');
+        if (_currentUser.displayName != null && _currentUser.displayName!.isNotEmpty) {
+          List<String> nameParts = _currentUser.displayName!.split(' ');
           if (nameParts.length > 1) {
             _userInitials = nameParts[0][0] + nameParts[1][0];
           } else {
@@ -44,7 +40,6 @@ class _ProfilePageState extends State<ProfilePage> {
           _userInitials = _userName[0].toUpperCase();
         }
         
-        // Форматируем дату создания аккаунта
         final creationTime = _currentUser.metadata.creationTime;
         if (creationTime != null) {
           final month = _getMonthName(creationTime.month);
@@ -64,7 +59,6 @@ class _ProfilePageState extends State<ProfilePage> {
     return months[month - 1];
   }
 
-  // Функция выхода из аккаунта
   Future<void> _signOut() async {
     final bool confirm = await showDialog(
       context: context,
@@ -91,7 +85,6 @@ class _ProfilePageState extends State<ProfilePage> {
       await FirebaseAuth.instance.signOut();
       if (!mounted) return;
       
-      // Используем go_router вместо Navigator
       context.go('/login');
     }
   }
@@ -105,7 +98,6 @@ class _ProfilePageState extends State<ProfilePage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Используем go_router вместо Navigator.pop
             context.pop();
           },
         ),
@@ -225,8 +217,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             title: const Text("Edit profile"),
                             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                             onTap: () {
-                              // Go_router навигация
-                              // context.push('/edit-profile');
+                              context.push('/edit-profile');
                             },
                           ),
                           Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey[300]),
@@ -235,7 +226,6 @@ class _ProfilePageState extends State<ProfilePage> {
                             title: const Text("Order history"),
                             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                             onTap: () {
-                              // Go_router навигация
                               // context.push('/order-history');
                             },
                           ),
