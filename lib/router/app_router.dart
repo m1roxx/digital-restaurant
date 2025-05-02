@@ -55,7 +55,7 @@ class ErrorScreen extends StatelessWidget {
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
-  debugLogDiagnostics: true,
+  debugLogDiagnostics: false,
   errorBuilder: (context, state) => ErrorScreen(
     error: state.error?.toString() ?? 'Unknown error',
   ),
