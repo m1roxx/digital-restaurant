@@ -2,6 +2,24 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+	<string>googlechromes</string>
+	<string>comgooglemaps</string>
+	<string>github</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+	<dict>
+		<key>CFBundleTypeRole</key>
+		<string>Editor</string>
+		<key>CFBundleURLSchemes</key>
+		<array>
+		<string>com.googleusercontent.apps.233864881789-f3v3qe86r7g3k8ue37tjd0k4b85rml3a</string>
+		<string>digital-restaurant-d1f92</string>
+		</array>
+	</dict>
+	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open.</string>
 	<key>io.flutter.embedded_views_preview</key>

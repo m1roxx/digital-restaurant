@@ -14,7 +14,7 @@ class _RestaurantMapPageState extends State<RestaurantMapPage> {
   final Set<Marker> _markers = {};
   final CameraPosition _initialCameraPosition = const CameraPosition(
     target: LatLng(51.1694, 71.4491), 
-    zoom: 12,
+    zoom: 13,
   );
   bool _isLoading = true;
 

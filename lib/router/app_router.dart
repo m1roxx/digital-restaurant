@@ -8,6 +8,7 @@ import 'package:digital_restaurant/pages/menu_page.dart';
 import 'package:digital_restaurant/pages/profile_page.dart';
 import 'package:digital_restaurant/pages/saved_page.dart';
 import 'package:digital_restaurant/pages/settings_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -59,6 +60,24 @@ final GoRouter appRouter = GoRouter(
   errorBuilder: (context, state) => ErrorScreen(
     error: state.error?.toString() ?? 'Unknown error',
   ),
+  redirect: (BuildContext context, GoRouterState state) {
+    final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+    final isAuthRoute = state.uri.toString() == '/' || 
+                        state.uri.toString() == '/login' || 
+                        state.uri.toString() == '/register';
+
+    // Если пользователь авторизован и пытается попасть на страницу входа/регистрации
+    if (isLoggedIn && isAuthRoute) {
+      return '/home';
+    }
+
+    // Если пользователь не авторизован и пытается попасть на защищенную страницу
+    if (!isLoggedIn && !isAuthRoute) {
+      return '/';
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/',

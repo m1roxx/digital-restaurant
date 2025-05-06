@@ -5,6 +5,7 @@ class Dish {
   final String description;
   final String imagePath;
   final String shortDescription;
+  final String category; 
 
   Dish({
     this.id,
@@ -13,6 +14,7 @@ class Dish {
     required this.description,
     required this.imagePath,
     required this.shortDescription,
+    required this.category,
   });
 
   factory Dish.fromFirestore(Map<String, dynamic> data, String id) {
@@ -23,6 +25,7 @@ class Dish {
       description: data['description'] ?? '',
       imagePath: data['imagePath'] ?? '',
       shortDescription: data['shortDescription'] ?? '',
+      category: data['category'] ?? '',
     );
   }
 }

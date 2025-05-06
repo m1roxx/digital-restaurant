@@ -1,5 +1,6 @@
 import 'package:digital_restaurant/controllers/theme_controller.dart';
 import 'package:digital_restaurant/router/app_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:digital_restaurant/firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,12 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) => ThemeController(),
-      child: const MyApp(),
+      child: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          return const MyApp();
+        },
+      ),
     ),
   );
 }
