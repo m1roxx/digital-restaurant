@@ -1,3 +1,4 @@
+import 'package:digital_restaurant/animations/animated_profile_page.dart';
 import 'package:digital_restaurant/auth_wrapper.dart';
 import 'package:digital_restaurant/pages/auth/login_page.dart';
 import 'package:digital_restaurant/pages/auth/register_page.dart';
@@ -5,7 +6,6 @@ import 'package:digital_restaurant/pages/cart_page.dart';
 import 'package:digital_restaurant/pages/edit_profile_page.dart';
 import 'package:digital_restaurant/pages/home_page.dart';
 import 'package:digital_restaurant/pages/menu_page.dart';
-import 'package:digital_restaurant/pages/profile_page.dart';
 import 'package:digital_restaurant/pages/saved_page.dart';
 import 'package:digital_restaurant/pages/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -66,12 +66,10 @@ final GoRouter appRouter = GoRouter(
                         state.uri.toString() == '/login' || 
                         state.uri.toString() == '/register';
 
-    // Если пользователь авторизован и пытается попасть на страницу входа/регистрации
     if (isLoggedIn && isAuthRoute) {
       return '/home';
     }
 
-    // Если пользователь не авторизован и пытается попасть на защищенную страницу
     if (!isLoggedIn && !isAuthRoute) {
       return '/';
     }
@@ -89,7 +87,19 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/profile',
-      builder: (context, state) => const ProfilePage(),
+      pageBuilder: (context, state) {
+        return CustomTransitionPage<void>(
+          key: state.pageKey,
+          child: const AnimatedProfilePage(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+              child: child,
+            );
+          },
+          transitionDuration: const Duration(milliseconds: 300),
+        );
+      },
     ),
     GoRoute(
       path: '/edit-profile',

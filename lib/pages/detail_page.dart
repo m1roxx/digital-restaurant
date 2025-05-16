@@ -15,6 +15,7 @@ class _DetailPageState extends State<DetailPage> {
   int quantity = 1;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool _isButtonPressed = false;
 
   Future<void> _addToCart() async {
     final user = _auth.currentUser;
@@ -187,21 +188,36 @@ class _DetailPageState extends State<DetailPage> {
               
               // Add to cart button
               Expanded(
-                child: ElevatedButton(
-                  onPressed: _addToCart,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() => _isButtonPressed = true);
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      _addToCart();
+                      setState(() => _isButtonPressed = false);
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: _isButtonPressed 
+                        ? Theme.of(context).colorScheme.primary.withOpacity(0.7)
+                        : Theme.of(context).colorScheme.primary,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                  ),
-                  child: const Text(
-                    'Add to cart',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    padding: EdgeInsets.symmetric(
+                      vertical: _isButtonPressed ? 14 : 16,
+                      horizontal: _isButtonPressed ? 10 : 0,
+                    ),
+                    child: Center(
+                      child: AnimatedDefaultTextStyle(
+                        duration: const Duration(milliseconds: 200),
+                        style: TextStyle(
+                          fontSize: _isButtonPressed ? 18 : 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        child: const Text('Add to cart'),
+                      ),
                     ),
                   ),
                 ),

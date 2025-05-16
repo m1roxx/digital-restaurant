@@ -114,26 +114,28 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Center(
-                      child: Container(
-                        width: 90,
-                        height: 90,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                        ),
-                        child: Center(
-                          child: Text(
-                            _userInitials,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.primary,
-                              fontSize: 28,
-                              fontWeight: FontWeight.w500,
+                      child: Hero(
+                        tag: 'profile-icon',
+                        child: Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _userInitials,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                    
                     const SizedBox(height: 16),
                     Text(
                       _userName,

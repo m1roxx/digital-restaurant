@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:lottie/lottie.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,19 +11,32 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   
   bool _isLoading = false;
   String _errorMessage = '';
+  
+  late final AnimationController _loadingController;
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadingController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+  }
 
   Future<void> _signInWithGoogle() async {
     setState(() {
       _isLoading = true;
       _errorMessage = '';
     });
+    
+    _loadingController.repeat();
 
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
@@ -40,14 +54,17 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       await FirebaseAuth.instance.signInWithCredential(credential);
+      if (mounted) {
+        context.go('/home');
+      }
       
-      // Removed explicit navigation
     } on FirebaseAuthException catch (e) {
       setState(() => _errorMessage = 'Google sign in failed: ${e.message}');
     } catch (e) {
       setState(() => _errorMessage = 'Error: ${e.toString()}');
     } finally {
       if (mounted) {
+        _loadingController.stop();
         setState(() => _isLoading = false);
       }
     }
@@ -59,13 +76,14 @@ class _LoginPageState extends State<LoginPage> {
       _errorMessage = '';
     });
     
+    _loadingController.repeat();
+    
     try {
       print("Starting GitHub authentication...");
       final UserCredential userCredential = 
           await FirebaseAuth.instance.signInWithProvider(GithubAuthProvider());
       
       print("Success! Redirecting to /home...");
-      // Removed explicit navigation
     } catch (e) {
       print("GitHub Auth Error: ${e.toString()}");
       if (mounted) {
@@ -76,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     } finally {
       if (mounted) {
+        _loadingController.stop();
         setState(() => _isLoading = false);
       }
     }
@@ -85,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _loadingController.dispose();
     super.dispose();
   }
 
@@ -93,12 +113,50 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
       _errorMessage = '';
     });
+    
+    _loadingController.repeat();
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            content: Center(
+              child: SizedBox(
+                height: 150,
+                width: 150,
+                child: Lottie.asset(
+                  'animations/success.json',
+                  animate: true,
+                  repeat: false,
+                  onLoaded: (composition) {
+                    Future.delayed(
+                      const Duration(milliseconds: 1500),
+                      () {
+                        Navigator.of(context).pop();
+                        context.go('/home');
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      return;
     } on FirebaseAuthException catch (e) {
       setState(() {
         if (e.code == 'user-not-found') {
@@ -115,11 +173,34 @@ class _LoginPageState extends State<LoginPage> {
       });
     } finally {
       if (mounted) {
+        _loadingController.stop();
         setState(() {
           _isLoading = false;
         });
       }
     }
+  }
+
+  Widget _buildLoadingAnimation() {
+    return SizedBox(
+      height: 50,
+      width: 50,
+      child: Lottie.asset(
+        'animations/loading.json',
+        controller: _loadingController,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+
+  Widget _buildSuccessAnimation() {
+    return SizedBox(
+      height: 100,
+      width: 100,
+      child: Lottie.asset(
+        'animations/success.json',
+      ),
+    );
   }
 
   @override
@@ -133,6 +214,9 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 40),
+                
+
+                
                 Text(
                   'Welcome back!',
                   style: TextStyle(
@@ -203,7 +287,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _login,
                     child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? _buildLoadingAnimation()
                         : const Text(
                             'Login',
                             style: TextStyle(
@@ -247,24 +331,26 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     onPressed: _isLoading ? null : _signInWithGoogle,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'images/google_icon.png',
-                          height: 24,
-                          width: 24,
+                    child: _isLoading 
+                      ? _buildLoadingAnimation()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'images/google_icon.png',
+                              height: 24,
+                              width: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Continue with Google',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Continue with Google',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
 
@@ -283,24 +369,26 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     onPressed: _isLoading ? null : _signInWithGitHub,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          'images/github_icon.png', 
-                          height: 24,
-                          width: 24,
+                    child: _isLoading
+                      ? _buildLoadingAnimation()
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'images/github_icon.png', 
+                              height: 24,
+                              width: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'Continue with GitHub',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Continue with GitHub',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
                 

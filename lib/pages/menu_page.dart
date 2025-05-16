@@ -168,6 +168,7 @@ class _MenuPageState extends State<MenuPage> {
                 _buildCategoryChip('All', null),
                 _buildCategoryChip('Hot Dishes', 'hot dishes'),
                 _buildCategoryChip('Soups', 'soups'),
+                _buildCategoryChip('Breakfast', 'breakfast'),
               ],
             ),
           ),

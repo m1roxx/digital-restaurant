@@ -55,63 +55,7 @@ Widget dishTile(BuildContext context, Dish dish) {
                       color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
-                  IconButton.filled(
-                    onPressed: () async {
-                      final user = FirebaseAuth.instance.currentUser;
-                      if (user == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Please login to add to cart'),
-                          ),
-                        );
-                        return;
-                      }
-
-                      final cartItemRef = FirebaseFirestore.instance
-                          .collection('carts')
-                          .doc(user.uid)
-                          .collection('items')
-                          .doc(dish.id);
-
-                      try {
-                        await FirebaseFirestore.instance.runTransaction(
-                          (transaction) async {
-                            final doc = await transaction.get(cartItemRef);
-                            if (doc.exists) {
-                              final currentQty = doc['quantity'] as int;
-                              transaction.update(
-                                  cartItemRef, {'quantity': currentQty + 1});
-                            } else {
-                              transaction.set(cartItemRef, {
-                                'dishId': dish.id,
-                                'quantity': 1,
-                                'addedAt': FieldValue.serverTimestamp(),
-                              });
-                            }
-                          },
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Added ${dish.title} to cart'),
-                            duration: const Duration(seconds: 1),
-                          ),
-                        );
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error: ${e.toString()}'),
-                          ),
-                        );
-                      }
-                    },
-                    style: IconButton.styleFrom(
-                      padding: const EdgeInsets.all(6),
-                      minimumSize: const Size(36, 36),
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    ),
-                    iconSize: 20,
-                    icon: const Icon(Icons.add),
-                  )
+                  _AnimatedAddButton(dish: dish),
                 ],
               ),
             ],
@@ -120,4 +64,131 @@ Widget dishTile(BuildContext context, Dish dish) {
       ],
     ),
   );
+}
+
+class _AnimatedAddButton extends StatefulWidget {
+  final Dish dish;
+
+  const _AnimatedAddButton({required this.dish});
+
+  @override
+  _AnimatedAddButtonState createState() => _AnimatedAddButtonState();
+}
+
+class _AnimatedAddButtonState extends State<_AnimatedAddButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _rotationAnimation;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.85).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    
+    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _addToCart(BuildContext context) async {
+    // Запускаем анимацию при нажатии
+    _controller.forward().then((_) => _controller.reverse());
+    
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please login to add to cart'),
+        ),
+      );
+      return;
+    }
+
+    final cartItemRef = FirebaseFirestore.instance
+        .collection('carts')
+        .doc(user.uid)
+        .collection('items')
+        .doc(widget.dish.id);
+
+    try {
+      await FirebaseFirestore.instance.runTransaction(
+        (transaction) async {
+          final doc = await transaction.get(cartItemRef);
+          if (doc.exists) {
+            final currentQty = doc['quantity'] as int;
+            transaction.update(cartItemRef, {'quantity': currentQty + 1});
+          } else {
+            transaction.set(cartItemRef, {
+              'dishId': widget.dish.id,
+              'quantity': 1,
+              'addedAt': FieldValue.serverTimestamp(),
+            });
+          }
+        },
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Added ${widget.dish.title} to cart'),
+          duration: const Duration(seconds: 1),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => _addToCart(context),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Transform.rotate(
+              angle: _rotationAnimation.value,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                      spreadRadius: _controller.value * 2,
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(8),
+                child: const Icon(
+                  Icons.add,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
