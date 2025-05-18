@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_restaurant/models/dish.dart';
+import 'package:digital_restaurant/services/favorites_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,31 @@ class _DetailPageState extends State<DetailPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool _isButtonPressed = false;
+  bool _isFavorite = false;
+  bool _isCheckingFavorite = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkFavoriteStatus();
+  }
+
+  Future<void> _checkFavoriteStatus() async {
+    final result = await FavoritesService.isInFavorites(widget.dish.id!);
+    if (mounted) {
+      setState(() {
+        _isFavorite = result;
+        _isCheckingFavorite = false;
+      });
+    }
+  }
+
+  Future<void> _toggleFavorite() async {
+    final newStatus = await FavoritesService.toggleFavorite(context, widget.dish.id!);
+    if (mounted) {
+      setState(() => _isFavorite = newStatus);
+    }
+  }
 
   Future<void> _addToCart() async {
     final user = _auth.currentUser;
@@ -71,15 +97,52 @@ class _DetailPageState extends State<DetailPage> {
               onPressed: () => Navigator.pop(context),
             ),
           ),
-          // Image
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.asset(
-              widget.dish.imagePath,
-              height: 250,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
+          // Image with Favorite Button
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.asset(
+                  widget.dish.imagePath,
+                  height: 250,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              // Favorite button
+              Positioned(
+                top: 12,
+                right: 12,
+                child: _isCheckingFavorite
+                    ? Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      )
+                    : InkWell(
+                        onTap: _toggleFavorite,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.8),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            _isFavorite ? Icons.favorite : Icons.favorite_border,
+                            size: 24,
+                            color: _isFavorite ? Colors.red : Colors.grey,
+                          ),
+                        ),
+                      ),
+              ),
+            ],
           ),
 
           const SizedBox(height: 16),

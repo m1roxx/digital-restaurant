@@ -123,7 +123,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/saved',
-      builder: (context, state) => const BookmarkPage(),
+      builder: (context, state) => const SavedPage(),
     ),
     GoRoute(
       path: '/settings',

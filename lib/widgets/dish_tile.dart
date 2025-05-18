@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_restaurant/models/dish.dart';
+import 'package:digital_restaurant/services/favorites_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,16 +13,26 @@ Widget dishTile(BuildContext context, Dish dish) {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SizedBox(
-          height: 180,
-          child: ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image.asset(
-              dish.imagePath,
-              fit: BoxFit.cover,
-              width: double.infinity,
+        Stack(
+          children: [
+            SizedBox(
+              height: 180,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                child: Image.asset(
+                  dish.imagePath,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
+              ),
             ),
-          ),
+            // Favorite button
+            Positioned(
+              top: 8,
+              right: 8,
+              child: _FavoriteButton(dishId: dish.id!),
+            ),
+          ],
         ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -64,6 +75,104 @@ Widget dishTile(BuildContext context, Dish dish) {
       ],
     ),
   );
+}
+
+class _FavoriteButton extends StatefulWidget {
+  final String dishId;
+
+  const _FavoriteButton({required this.dishId});
+
+  @override
+  _FavoriteButtonState createState() => _FavoriteButtonState();
+}
+
+class _FavoriteButtonState extends State<_FavoriteButton> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isFavorite = false;
+  bool _isLoading = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.elasticOut),
+    );
+    
+    _checkFavoriteStatus();
+  }
+  
+  Future<void> _checkFavoriteStatus() async {
+    final isFavorite = await FavoritesService.isInFavorites(widget.dishId);
+    if (mounted) {
+      setState(() {
+        _isFavorite = isFavorite;
+        _isLoading = false;
+      });
+    }
+  }
+  
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toggleFavorite() async {
+    _controller.forward().then((_) => _controller.reverse());
+    
+    final newStatus = await FavoritesService.toggleFavorite(context, widget.dishId);
+    if (mounted) {
+      setState(() => _isFavorite = newStatus);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.8),
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(8),
+        child: const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+    
+    return GestureDetector(
+      onTap: _toggleFavorite,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return Transform.scale(
+            scale: _scaleAnimation.value,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.8),
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Icon(
+                _isFavorite ? Icons.favorite : Icons.favorite_border,
+                size: 20,
+                color: _isFavorite ? Colors.red : Colors.grey,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _AnimatedAddButton extends StatefulWidget {

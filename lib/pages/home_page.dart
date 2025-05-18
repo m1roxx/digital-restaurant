@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     const MenuPage(),
     const CartPage(),
-    const BookmarkPage(),
+    const SavedPage(),
     const SettingsPage(),
   ];
   
