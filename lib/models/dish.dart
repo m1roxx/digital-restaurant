@@ -5,7 +5,9 @@ class Dish {
   final String description;
   final String imagePath;
   final String shortDescription;
-  final String category; 
+  final String category;
+  final double averageRating;
+  final int reviewCount;
 
   Dish({
     this.id,
@@ -15,6 +17,8 @@ class Dish {
     required this.imagePath,
     required this.shortDescription,
     required this.category,
+    this.averageRating = 0.0,
+    this.reviewCount = 0,
   });
 
   factory Dish.fromFirestore(Map<String, dynamic> data, String id) {
@@ -26,6 +30,21 @@ class Dish {
       imagePath: data['imagePath'] ?? '',
       shortDescription: data['shortDescription'] ?? '',
       category: data['category'] ?? '',
+      averageRating: (data['averageRating'] ?? 0.0).toDouble(),
+      reviewCount: data['reviewCount'] ?? 0,
     );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'title': title,
+      'price': price,
+      'description': description,
+      'imagePath': imagePath,
+      'shortDescription': shortDescription,
+      'category': category,
+      'averageRating': averageRating,
+      'reviewCount': reviewCount,
+    };
   }
 }

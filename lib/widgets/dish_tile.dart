@@ -54,6 +54,34 @@ Widget dishTile(BuildContext context, Dish dish) {
                   color: Colors.grey[500],
                 ),
               ),
+              const SizedBox(height: 8),
+              // Rating Row
+              if (dish.reviewCount > 0)
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      size: 16,
+                      color: Colors.amber,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      dish.averageRating.toStringAsFixed(1),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '(${dish.reviewCount})',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
               const SizedBox(height: 4),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,7 +241,6 @@ class _AnimatedAddButtonState extends State<_AnimatedAddButton> with SingleTicke
   }
 
   Future<void> _addToCart(BuildContext context) async {
-    // Запускаем анимацию при нажатии
     _controller.forward().then((_) => _controller.reverse());
     
     final user = FirebaseAuth.instance.currentUser;

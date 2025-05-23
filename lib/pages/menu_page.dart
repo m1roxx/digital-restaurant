@@ -38,7 +38,7 @@ class _MenuPageState extends State<MenuPage> {
           ),
         ),
         SizedBox(
-          height: 330,
+          height: 355,
           child: AnimationLimiter(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
