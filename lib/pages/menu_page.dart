@@ -3,8 +3,10 @@ import 'package:digital_restaurant/widgets/dish_tile.dart';
 import 'package:digital_restaurant/models/dish.dart';
 import 'package:digital_restaurant/pages/detail_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 enum SortType { lowToHigh, highToLow }
+enum MenuType { main, bar }
 
 class MenuPage extends StatefulWidget {
   const MenuPage({super.key});
@@ -17,31 +19,64 @@ class _MenuPageState extends State<MenuPage> {
   final Stream<QuerySnapshot> _dishesStream =
       FirebaseFirestore.instance.collection('dishes').snapshots();
   String _searchQuery = '';
-  String? _selectedCategory;
   SortType _currentSort = SortType.lowToHigh;
+  MenuType _currentMenuType = MenuType.main;
 
-  Widget _buildCategoryChip(String label, String? category) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: _selectedCategory == category,
-        onSelected: (selected) {
-          setState(() {
-            _selectedCategory = selected ? category : null;
-          });
-        },
-        selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-        labelStyle: TextStyle(
-          color: _selectedCategory == category 
-              ? Theme.of(context).colorScheme.primary 
-              : Colors.grey[600],
+  Widget _buildCategorySection(String category, List<Dish> dishes) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            category,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
         ),
-        side: BorderSide.none,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+        SizedBox(
+          height: 330,
+          child: AnimationLimiter(
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: dishes.length,
+              itemBuilder: (context, index) {
+                final dish = dishes[index];
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  duration: const Duration(milliseconds: 500),
+                  child: SlideAnimation(
+                    horizontalOffset: 50.0,
+                    child: FadeInAnimation(
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          left: index == 0 ? 16 : 12,
+                          right: index == dishes.length - 1 ? 16 : 0,
+                        ),
+                        child: GestureDetector(
+                          onTap: () => showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) => DetailPage(dish: dish),
+                          ),
+                          child: SizedBox(
+                            width: 220,
+                            child: dishTile(context, dish),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -97,6 +132,60 @@ class _MenuPageState extends State<MenuPage> {
     }
   }
 
+  Widget _buildMenuTypeSelector() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildMenuTypeButton(
+              title: 'Main Menu',
+              isSelected: _currentMenuType == MenuType.main,
+              onPressed: () => setState(() => _currentMenuType = MenuType.main),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: _buildMenuTypeButton(
+              title: 'Bar Menu',
+              isSelected: _currentMenuType == MenuType.bar,
+              onPressed: () => setState(() => _currentMenuType = MenuType.bar),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuTypeButton({
+    required String title,
+    required bool isSelected,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected 
+            ? Theme.of(context).colorScheme.primary
+            : Theme.of(context).colorScheme.surface,
+        foregroundColor: isSelected 
+            ? Theme.of(context).colorScheme.onPrimary
+            : Theme.of(context).colorScheme.onSurface,
+        elevation: isSelected ? 2 : 0,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -114,6 +203,8 @@ class _MenuPageState extends State<MenuPage> {
             ),
           ),
         ),
+
+        _buildMenuTypeSelector(),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -157,26 +248,8 @@ class _MenuPageState extends State<MenuPage> {
             ],
           ),
         ),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                _buildCategoryChip('All', null),
-                _buildCategoryChip('Hot Dishes', 'hot dishes'),
-                _buildCategoryChip('Soups', 'soups'),
-                _buildCategoryChip('Breakfast', 'breakfast'),
-              ],
-            ),
-          ),
-        ),
         
-        Container(
-          height: 360,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+        Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: _dishesStream,
             builder: (context, snapshot) {
@@ -190,41 +263,82 @@ class _MenuPageState extends State<MenuPage> {
                 return Dish.fromFirestore(data, doc.id);
               }).toList();
 
-              List<Dish> filteredDishes = allDishes.where((dish) {
-                final matchesSearch = dish.title.toLowerCase().contains(_searchQuery.toLowerCase());
-                final matchesCategory = _selectedCategory == null 
-                    ? true 
-                    : dish.category == _selectedCategory;
-                return matchesSearch && matchesCategory;
-              }).toList();
+              // Apply search filter
+              List<Dish> filteredDishes = allDishes;
+              if (_searchQuery.isNotEmpty) {
+                filteredDishes = allDishes.where((dish) {
+                  return dish.title.toLowerCase().contains(_searchQuery.toLowerCase());
+                }).toList();
+              }
 
+              // Sort dishes
               filteredDishes.sort((a, b) => _currentSort == SortType.lowToHigh
                 ? a.price.compareTo(b.price)
                 : b.price.compareTo(a.price)
               );
 
-              return ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: filteredDishes.length,
-                itemBuilder: (context, index) {
-                  final dish = filteredDishes[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 16),
-                    child: GestureDetector(
-                      onTap: () => showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => DetailPage(dish: dish),
+              // Group dishes by category
+              Map<String, List<Dish>> categorizedDishes = {};
+              for (var dish in filteredDishes) {
+                if (!categorizedDishes.containsKey(dish.category)) {
+                  categorizedDishes[dish.category] = [];
+                }
+                categorizedDishes[dish.category]!.add(dish);
+              }
+
+              // Define main menu and bar menu categories
+              List<String> mainMenuCategories = [
+                'breakfast',
+                'soups',
+                'hot dishes',
+              ];
+              
+              List<String> barMenuCategories = [
+                'bubble teas',
+                'lemonades',
+              ];
+
+              // Select which categories to display based on current menu type
+              List<String> categoriesToDisplay = _currentMenuType == MenuType.main
+                  ? mainMenuCategories
+                  : barMenuCategories;
+
+              // Add any categories found in data that aren't in our predefined lists
+              if (_currentMenuType == MenuType.main) {
+                categorizedDishes.keys.forEach((category) {
+                  if (!mainMenuCategories.contains(category) && 
+                      !barMenuCategories.contains(category)) {
+                    categoriesToDisplay.add(category);
+                  }
+                });
+              }
+
+              // Filter out categories that don't have dishes
+              categoriesToDisplay = categoriesToDisplay.where(
+                (category) => categorizedDishes.containsKey(category)
+              ).toList();
+
+              return categoriesToDisplay.isEmpty
+                  ? Center(
+                      child: Text(
+                        'No dishes found for ${_currentMenuType == MenuType.main ? 'Main Menu' : 'Bar Menu'}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
                       ),
-                      child: SizedBox(
-                        width: 220,
-                        child: dishTile(context, dish),
-                      ),
-                    ),
-                  );
-                },
-              );
+                    )
+                  : ListView.builder(
+                      itemCount: categoriesToDisplay.length,
+                      itemBuilder: (context, index) {
+                        final category = categoriesToDisplay[index];
+                        final dishes = categorizedDishes[category]!;
+                        return _buildCategorySection(
+                          category[0].toUpperCase() + category.substring(1), // Capitalize first letter
+                          dishes
+                        );
+                      },
+                    );
             },
           ),
         ),

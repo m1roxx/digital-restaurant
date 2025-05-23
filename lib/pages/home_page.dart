@@ -1,5 +1,4 @@
 import 'package:digital_restaurant/animations/custom_page_transitions.dart';
-import 'package:digital_restaurant/pages/profile_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -85,64 +84,27 @@ class _HomePageState extends State<HomePage> {
         actions: [
           InkWell(
             borderRadius: BorderRadius.circular(18),
-            child: Hero(
-              tag: 'profile-icon',
-              child: Container(
-                width: 36,
-                height: 36,
-                margin: const EdgeInsets.only(right: 16),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                ),
-                child: Center(
-                  child: Text(
-                    _getUserInitials(),
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+            child: Container( // Убираем Hero
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.only(right: 16),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              ),
+              child: Center(
+                child: Text(
+                  _getUserInitials(),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
-              flightShuttleBuilder: (
-                BuildContext flightContext,
-                Animation<double> animation,
-                HeroFlightDirection flightDirection,
-                BuildContext fromHeroContext,
-                BuildContext toHeroContext,
-              ) {
-                return Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                  ),
-                  child: Center(
-                    child: Text(
-                      _getUserInitials(),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontSize: Tween<double>(begin: 16, end: 28).evaluate(animation),
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                );
-              },
             ),
             onTap: () {
-              final RenderBox renderBox = context.findRenderObject() as RenderBox;
-              final position = renderBox.localToGlobal(Offset.zero);              
-              final screenWidth = MediaQuery.of(context).size.width;
-              final startOffset = Offset((position.dx / screenWidth) - 0.5, -0.2);
-              
-              Navigator.of(context).push(
-                ProfilePageTransition(
-                  page: const ProfilePage(),
-                  begin: startOffset,
-                ),
-              );
+              GoRouter.of(context).go('/profile');
             },
           ),
         ],

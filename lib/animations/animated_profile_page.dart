@@ -1,3 +1,4 @@
+import 'package:digital_restaurant/pages/order_history_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -138,9 +139,10 @@ class _AnimatedProfilePageState extends State<AnimatedProfilePage>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // Play reverse animation before popping
             _animationController.reverse().then((_) {
-              if (mounted) Navigator.of(context).pop();
+              if (mounted) {
+                context.go("/home");
+              }
             });
           },
         ),
@@ -158,25 +160,22 @@ class _AnimatedProfilePageState extends State<AnimatedProfilePage>
                   children: [
                     // Animated avatar
                     Center(
-                      child: Hero(
-                        tag: 'profile-icon',
-                        child: ScaleTransition(
-                          scale: Tween<double>(begin: 0.5, end: 1.0).animate(_avatarAnimation),
-                          child: Container(
-                            width: 90,
-                            height: 90,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                            ),
-                            child: Center(
-                              child: Text(
-                                _userInitials,
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                      child: ScaleTransition(
+                        scale: Tween<double>(begin: 0.5, end: 1.0).animate(_avatarAnimation),
+                        child: Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                          ),
+                          child: Center(
+                            child: Text(
+                              _userInitials,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontSize: 28,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ),
@@ -287,6 +286,11 @@ class _AnimatedProfilePageState extends State<AnimatedProfilePage>
                                 title: const Text("Order history"),
                                 trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                                 onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => const OrderHistoryPage(),
+                                    ),
+                                  );
                                 },
                               ),
                               Divider(height: 1, indent: 16, endIndent: 16, color: Colors.grey[300]),

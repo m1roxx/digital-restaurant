@@ -3,9 +3,11 @@ import 'package:digital_restaurant/auth_wrapper.dart';
 import 'package:digital_restaurant/pages/auth/login_page.dart';
 import 'package:digital_restaurant/pages/auth/register_page.dart';
 import 'package:digital_restaurant/pages/cart_page.dart';
+import 'package:digital_restaurant/pages/change_password_page.dart';
 import 'package:digital_restaurant/pages/edit_profile_page.dart';
 import 'package:digital_restaurant/pages/home_page.dart';
 import 'package:digital_restaurant/pages/menu_page.dart';
+import 'package:digital_restaurant/pages/order_history_page.dart';
 import 'package:digital_restaurant/pages/saved_page.dart';
 import 'package:digital_restaurant/pages/settings_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -83,21 +85,20 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/home',
-      builder: (context, state) => const HomePage(),
+      pageBuilder: (context, state) => _buildFadeTransition(state, const HomePage()),
     ),
     GoRoute(
       path: '/profile',
       pageBuilder: (context, state) {
-        return CustomTransitionPage<void>(
+        return CustomTransitionPage(
           key: state.pageKey,
           child: const AnimatedProfilePage(),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(
-              opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+              opacity: animation,
               child: child,
             );
           },
-          transitionDuration: const Duration(milliseconds: 300),
         );
       },
     ),
@@ -115,7 +116,7 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/menu',
-      builder: (context, state) => MenuPage(),
+      builder: (context, state) => const MenuPage(),
     ),
     GoRoute(
       path: '/cart',
@@ -129,5 +130,28 @@ final GoRouter appRouter = GoRouter(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
     ),
+    GoRoute(
+      path: '/order-history',
+      builder: (context, state) => const OrderHistoryPage(),
+    ),
+    GoRoute(
+      path: '/change-password',
+      builder: (context, state) => const ChangePasswordPage(),
+    ),
   ],
 );
+
+CustomTransitionPage _buildFadeTransition(GoRouterState state, Widget child) {
+  return CustomTransitionPage(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 300),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(
+        opacity: animation,
+        child: child,
+      );
+    },
+  );
+}

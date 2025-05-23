@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:digital_restaurant/models/cart_item.dart';
 import 'package:digital_restaurant/models/dish.dart';
+import 'package:digital_restaurant/models/order.dart' as order_model;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -185,6 +186,21 @@ class CartPage extends StatelessWidget {
         .collection('items')
         .get();
     
+    // Early return if cart is empty
+    if (cartItems.docs.isEmpty) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Your cart is empty'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+    
+    // Prepare cart items data for later use when saving order
+    List<Map<String, dynamic>> cartItemsData = [];
+    
     for (final cartItemDoc in cartItems.docs) {
       final cartItem = CartItem.fromFirestore(cartItemDoc.data());
       final dishDoc = await FirebaseFirestore.instance
@@ -194,6 +210,15 @@ class CartPage extends StatelessWidget {
       if (dishDoc.exists) {
         final dish = Dish.fromFirestore(dishDoc.data()!, dishDoc.id);
         total += dish.price * cartItem.quantity;
+        
+        // Save dish details for order creation
+        cartItemsData.add({
+          'dishId': cartItem.dishId,
+          'dishName': dish.title,
+          'price': dish.price.toDouble(),
+          'quantity': cartItem.quantity,
+          'imagePath': dish.imagePath,
+        });
       }
     }
 
@@ -271,17 +296,41 @@ class CartPage extends StatelessWidget {
                       style: TextStyle(color: Theme.of(context).hintColor)),
                 ),
                 FilledButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Order placed for ${DateFormat('MMM dd, yyyy').format(selectedDate)} at ${selectedTime.format(context)}',
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                      ),
+                  onPressed: () async {
+                    // Create delivery date by combining selected date and time
+                    final deliveryDate = DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
                     );
+                    
+                    // Create and save order
+                    await _createOrder(
+                      userId: userId,
+                      items: cartItemsData,
+                      total: total,
+                      deliveryDate: deliveryDate,
+                    );
+                    
+                    // Close dialog
+                    if (context.mounted) Navigator.of(context).pop();
+                    
+                    // Clear cart after successful order
+                    await _clearCart(userId);
+                  
+                    // Show confirmation
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Order placed for ${DateFormat('MMM dd, yyyy').format(selectedDate)} at ${selectedTime.format(context)}',
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }
                   },
                   child: const Text('Place Order'),
                 ),
@@ -291,6 +340,55 @@ class CartPage extends StatelessWidget {
         );
       },
     );
+  }
+  
+  Future<void> _createOrder({
+    required String userId,
+    required List<Map<String, dynamic>> items, 
+    required double total,
+    required DateTime deliveryDate,
+  }) async {
+    // Convert cart items to order items
+    final orderItems = items.map((item) => order_model.OrderItem(
+      dishId: item['dishId'],
+      dishName: item['dishName'],
+      price: item['price'],
+      quantity: item['quantity'],
+      imagePath: item['imagePath'],
+    )).toList();
+    
+    // Create order
+    final order = order_model.Order(
+      id: FirebaseFirestore.instance.collection('orders').doc().id,
+      userId: userId,
+      items: orderItems,
+      total: total,
+      orderDate: DateTime.now(),
+      deliveryDate: deliveryDate,
+      status: 'pending',
+    );
+    
+    // Save order to Firestore in user's orders collection
+    await FirebaseFirestore.instance
+        .collection('orders')
+        .doc(userId)
+        .collection('user_orders')
+        .doc(order.id)
+        .set(order.toFirestore());
+  }
+  
+  Future<void> _clearCart(String userId) async {
+    // Get all cart items
+    final cartItems = await FirebaseFirestore.instance
+        .collection('carts')
+        .doc(userId)
+        .collection('items')
+        .get();
+    
+    // Delete each item
+    for (final doc in cartItems.docs) {
+      await doc.reference.delete();
+    }
   }
 }
 

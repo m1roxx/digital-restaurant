@@ -1,5 +1,7 @@
+import 'package:digital_restaurant/pages/order_history_page.dart';
 import 'package:digital_restaurant/pages/restaurant_map_page.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:digital_restaurant/controllers/theme_controller.dart';
 
@@ -12,26 +14,65 @@ class SettingsPage extends StatelessWidget {
     return ListView(
       children: [
         // Settings
-        Container(
-          margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Padding(
-            padding: EdgeInsets.all(14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Settings",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold
+        GestureDetector(
+          onTap: () {
+            context.go("/profile");
+          },
+          child: Container(
+            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Account",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold
+                    ),
                   ),
-                ),
-                Icon(Icons.arrow_forward_ios)
-              ],
+                  Icon(Icons.arrow_forward_ios)
+                ],
+              ),
+            ),
+          ),
+        ),
+        
+        // Order History
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const OrderHistoryPage(),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(top: 16, left: 16, right: 16),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.all(14),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Order History",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios)
+                ],
+              ),
             ),
           ),
         ),
