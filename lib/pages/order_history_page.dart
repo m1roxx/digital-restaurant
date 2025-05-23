@@ -93,7 +93,6 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                 final orders = snapshot.data!.docs.map((doc) {
                   final data = doc.data() as Map<String, dynamic>;
                   
-                  // Safe extraction of items with proper error handling
                   List<models.OrderItem> orderItems = [];
                   try {
                     if (data['items'] is List) {
@@ -131,7 +130,6 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                     print('Error parsing order date: $e');
                   }
                   
-                  // Safe delivery date parsing
                   DateTime deliveryDate = orderDate.add(const Duration(days: 1));
                   try {
                     final dynamic deliveryDateData = data['deliveryDate'];
@@ -146,7 +144,6 @@ class _OrderHistoryPageState extends State<OrderHistoryPage> {
                     print('Error parsing delivery date: $e');
                   }
                   
-                  // Parse total amount safely
                   double total = 0.0;
                   try {
                     if (data['total'] is num) {

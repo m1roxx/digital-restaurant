@@ -40,23 +40,19 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     });
     
     try {
-      // Get current user
       final User? user = FirebaseAuth.instance.currentUser;
       
       if (user == null) {
         throw Exception("User not authenticated");
       }
       
-      // Reauthenticate with current password
       AuthCredential credential = EmailAuthProvider.credential(
         email: user.email!,
         password: _currentPasswordController.text,
       );
       
       await user.reauthenticateWithCredential(credential);
-      
-      // Change the password
-      await user.updatePassword(_newPasswordController.text);
+            await user.updatePassword(_newPasswordController.text);
       
       if (!mounted) return;
       
@@ -115,7 +111,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Error message
               if (_errorMessage != null) ...[
                 Container(
                   padding: const EdgeInsets.all(12),
@@ -142,7 +137,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // Current password field
                     TextFormField(
                       controller: _currentPasswordController,
                       obscureText: _obscureCurrentPassword,
@@ -169,9 +163,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
-                    
-                    // New password field
+                    const SizedBox(height: 16),                   
                     TextFormField(
                       controller: _newPasswordController,
                       obscureText: _obscureNewPassword,

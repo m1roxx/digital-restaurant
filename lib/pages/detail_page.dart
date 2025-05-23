@@ -172,7 +172,7 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
 
           const SizedBox(height: 12),
 
-          // Rating Display
+          // Rating
           if (widget.dish.reviewCount > 0) ...[
             Row(
               children: [
@@ -217,7 +217,6 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
         return SingleChildScrollView(
           child: Column(
             children: [
-              // Add Review Section
               if (!_hasUserReviewed && _auth.currentUser != null) ...[
                 Container(
                   margin: const EdgeInsets.all(16),
@@ -364,7 +363,6 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
       ),
       child: Column(
         children: [
-          // Header with close button
           Padding(
             padding: const EdgeInsets.only(right: 20, top: 8),
             child: Align(
@@ -450,7 +448,6 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
             ),
           ),
 
-          // Fixed bottom buttons
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
             decoration: BoxDecoration(
@@ -458,7 +455,6 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
             ),
             child: Row(
               children: [
-                // Quantity controls
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),

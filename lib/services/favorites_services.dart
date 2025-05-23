@@ -7,7 +7,6 @@ class FavoritesService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Check if a dish is saved
   static Future<bool> isInFavorites(String dishId) async {
     final user = _auth.currentUser;
     if (user == null) return false;

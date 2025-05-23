@@ -3,6 +3,7 @@ import 'package:digital_restaurant/models/dish.dart';
 import 'package:digital_restaurant/pages/detail_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SavedPage extends StatefulWidget {
   const SavedPage({super.key});
@@ -38,7 +39,6 @@ class _SavedPageState extends State<SavedPage> {
     }
 
     try {
-      // Get all saved dish IDs for current user
       final savedSnapshot = await _firestore
           .collection('saved')
           .doc(user.uid)
@@ -57,7 +57,6 @@ class _SavedPageState extends State<SavedPage> {
         return;
       }
       
-      // Fetch dish details from Firestore
       final dishesSnapshot = await _firestore
           .collection('dishes')
           .where(FieldPath.documentId, whereIn: savedDishIds)
@@ -130,7 +129,7 @@ class _SavedPageState extends State<SavedPage> {
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Navigate to login page
+                context.go('/login');
               },
               child: const Text('Log In'),
             ),

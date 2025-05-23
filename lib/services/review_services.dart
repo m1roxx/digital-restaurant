@@ -54,7 +54,6 @@ class ReviewService {
     }
 
     try {
-      // Check if user already reviewed this dish
       final existingReview = await _firestore
           .collection('reviews')
           .where('dishId', isEqualTo: dishId)
@@ -68,7 +67,6 @@ class ReviewService {
         return false;
       }
 
-      // Get user name from auth or use email as fallback
       String userName = user.displayName ?? user.email?.split('@')[0] ?? 'Anonymous';
 
       // Add review
@@ -83,7 +81,6 @@ class ReviewService {
 
       await _firestore.collection('reviews').add(reviewData.toFirestore());
 
-      // Update dish average rating
       await _updateDishRating(dishId);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -145,7 +142,6 @@ class ReviewService {
       await _firestore.collection('reviews').doc(reviewId).delete();
       await _updateDishRating(dishId);
       
-      // Проверяем, что контекст еще активен
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Review deleted successfully')),
@@ -153,7 +149,6 @@ class ReviewService {
       }
       return true;
     } catch (e) {
-      // Проверяем, что контекст еще активен
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error deleting review: $e')),

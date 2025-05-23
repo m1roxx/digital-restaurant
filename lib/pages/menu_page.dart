@@ -263,7 +263,6 @@ class _MenuPageState extends State<MenuPage> {
                 return Dish.fromFirestore(data, doc.id);
               }).toList();
 
-              // Apply search filter
               List<Dish> filteredDishes = allDishes;
               if (_searchQuery.isNotEmpty) {
                 filteredDishes = allDishes.where((dish) {
@@ -271,13 +270,11 @@ class _MenuPageState extends State<MenuPage> {
                 }).toList();
               }
 
-              // Sort dishes
               filteredDishes.sort((a, b) => _currentSort == SortType.lowToHigh
                 ? a.price.compareTo(b.price)
                 : b.price.compareTo(a.price)
               );
 
-              // Group dishes by category
               Map<String, List<Dish>> categorizedDishes = {};
               for (var dish in filteredDishes) {
                 if (!categorizedDishes.containsKey(dish.category)) {
@@ -286,7 +283,6 @@ class _MenuPageState extends State<MenuPage> {
                 categorizedDishes[dish.category]!.add(dish);
               }
 
-              // Define main menu and bar menu categories
               List<String> mainMenuCategories = [
                 'breakfast',
                 'soups',
@@ -298,12 +294,10 @@ class _MenuPageState extends State<MenuPage> {
                 'lemonades',
               ];
 
-              // Select which categories to display based on current menu type
               List<String> categoriesToDisplay = _currentMenuType == MenuType.main
                   ? mainMenuCategories
                   : barMenuCategories;
 
-              // Add any categories found in data that aren't in our predefined lists
               if (_currentMenuType == MenuType.main) {
                 categorizedDishes.keys.forEach((category) {
                   if (!mainMenuCategories.contains(category) && 
@@ -313,7 +307,6 @@ class _MenuPageState extends State<MenuPage> {
                 });
               }
 
-              // Filter out categories that don't have dishes
               categoriesToDisplay = categoriesToDisplay.where(
                 (category) => categorizedDishes.containsKey(category)
               ).toList();
@@ -334,7 +327,7 @@ class _MenuPageState extends State<MenuPage> {
                         final category = categoriesToDisplay[index];
                         final dishes = categorizedDishes[category]!;
                         return _buildCategorySection(
-                          category[0].toUpperCase() + category.substring(1), // Capitalize first letter
+                          category[0].toUpperCase() + category.substring(1), 
                           dishes
                         );
                       },
